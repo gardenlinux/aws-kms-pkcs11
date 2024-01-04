@@ -1,0 +1,54 @@
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [ amd64, arm64 ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: aws/aws-sdk-cpp
+          ref: 1.11.228
+          path: aws-sdk-cpp
+          submodules: recursive
+      - uses: gardenlinux/gh-action-podman-run@main
+        with:
+          arch: ${{ matrix.arch }}
+          mounts: "${{ github.workspace }}:/mnt"
+          run: |
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential cmake libcurl4-openssl-dev libengine-pkcs11-openssl libjson-c-dev libssl-dev libp11-kit-dev libp11-dev zlib1g-dev
+            cd /mnt/aws-sdk-cpp
+            mkdir .build
+            cd .build
+            cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DBUILD_ONLY="kms;acm-pca" ..
+            make -j "$(nproc)" install
+            cd /mnt
+            make -j "$(nproc)" AWS_SDK_STATIC=y
+      - run: mv aws_kms_pkcs11.so aws_kms_pkcs11-${{ matrix.arch }}.so
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.arch }}
+          path: aws_kms_pkcs11-${{ matrix.arch }}.so
+  release:
+    needs: build
+    if: ${{ github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: amd64
+      - uses: actions/download-artifact@v4
+        with:
+          name: arm64
+      - name: tag and release
+        run: |
+          git tag --force latest
+          git push --force origin latest
+          .github/workflows/publish_release ${{ secrets.GITHUB_TOKEN }} ${{ github.repository }} latest "$(basename '${{ github.repository }}')" 'created by GitHub actions run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})' << EOF
+          aws_kms_pkcs11-amd64.so
+          aws_kms_pkcs11-arm64.so
+          EOF
