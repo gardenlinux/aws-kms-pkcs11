@@ -5,7 +5,7 @@ commands:
     steps:
       - checkout
       - run:
-          command: apt-get update && bash -c 'DEBIAN_FRONTEND=noninteractive apt-get install build-essential gcc g++ cmake libcurl4-openssl-dev libssl-dev libopencryptoki-dev libjson-c-dev libp11-kit-dev'
+          command: sudo apt-get update && sudo bash -c 'DEBIAN_FRONTEND=noninteractive apt-get install build-essential gcc g++ cmake libcurl4-openssl-dev libssl-dev libopencryptoki-dev libjson-c-dev libp11-kit-dev'
       - restore_cache:
           key: aws-sdk-cpp-1.11.511-{{arch}}
       - run:
@@ -37,13 +37,15 @@ commands:
 
 jobs:
   build-jammy-amd64:
-    docker:
-      - image: ubuntu:22.04
+    machine:
+      image: ubuntu-2204:current
+    resource_class: medium
     steps:
       - build_common
   build-noble-amd64:
-    docker:
-      - image: ubuntu:24.04
+    machine:
+      image: ubuntu-2404:current
+    resource_class: medium
     steps:
       - build_common
   build-jammy-arm64:
