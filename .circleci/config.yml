@@ -7,7 +7,7 @@ commands:
       - run:
           command: sudo apt-get update && sudo bash -c 'DEBIAN_FRONTEND=noninteractive apt-get install build-essential gcc g++ cmake libcurl4-openssl-dev libssl-dev libopencryptoki-dev libjson-c-dev libp11-kit-dev'
       - restore_cache:
-          key: aws-sdk-cpp-1.11.511-{{ .Environment.OS_VERSION_ID }}-{{arch}}
+          key: aws-sdk-cpp-1.11.511-{{ checksum "/etc/os-release" }}-{{arch}}
       - run:
           command: |
             if [[ ! -e ~/aws-sdk-cpp ]]; then
@@ -20,7 +20,7 @@ commands:
                 cd ~/aws-sdk-cpp-src/sdk_build && cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_ONLY="kms;acm-pca" -DENABLE_TESTING=OFF -DCMAKE_INSTALL_PREFIX=$HOME/aws-sdk-cpp -DBUILD_SHARED_LIBS=OFF && make && make install
             fi
       - save_cache:
-          key: aws-sdk-cpp-1.11.511-{{ .Environment.OS_VERSION_ID }}-{{arch}}
+          key: aws-sdk-cpp-1.11.511-{{ checksum "/etc/os-release" }}-{{arch}}
           paths:
             - ~/aws-sdk-cpp
       - run:
@@ -40,32 +40,24 @@ jobs:
     machine:
       image: ubuntu-2204:current
     resource_class: medium
-    environment:
-      OS_VERSION_ID: "22.04"
     steps:
       - build_common
   build-noble-amd64:
     machine:
       image: ubuntu-2404:current
     resource_class: medium
-    environment:
-      OS_VERSION_ID: "24.04"
     steps:
       - build_common
   build-jammy-arm64:
     machine:
       image: ubuntu-2204:current
     resource_class: arm.medium
-    environment:
-      OS_VERSION_ID: "22.04"
     steps:
       - build_common
   build-noble-arm64:
     machine:
       image: ubuntu-2404:current
     resource_class: arm.medium
-    environment:
-      OS_VERSION_ID: "24.04"
     steps:
       - build_common
 
