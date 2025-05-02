@@ -32,7 +32,7 @@ commands:
       - persist_to_workspace:
           root: artifacts
           paths:
-            - "aws_kms_pkcs11.*.so"
+            - "aws_kms_pkcs11-*.so"
 
 
 jobs:
