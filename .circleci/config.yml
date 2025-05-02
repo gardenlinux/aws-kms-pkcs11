@@ -41,7 +41,7 @@ jobs:
       image: ubuntu-2204:current
     resource_class: medium
     environment:
-      OS_VERSION_ID: 22.04
+      OS_VERSION_ID: "22.04"
     steps:
       - build_common
   build-noble-amd64:
@@ -49,7 +49,7 @@ jobs:
       image: ubuntu-2404:current
     resource_class: medium
     environment:
-      OS_VERSION_ID: 24.04
+      OS_VERSION_ID: "24.04"
     steps:
       - build_common
   build-jammy-arm64:
@@ -57,7 +57,7 @@ jobs:
       image: ubuntu-2204:current
     resource_class: arm.medium
     environment:
-      OS_VERSION_ID: 22.04
+      OS_VERSION_ID: "22.04"
     steps:
       - build_common
   build-noble-arm64:
@@ -65,7 +65,7 @@ jobs:
       image: ubuntu-2404:current
     resource_class: arm.medium
     environment:
-      OS_VERSION_ID: 24.04
+      OS_VERSION_ID: "24.04"
     steps:
       - build_common
 
