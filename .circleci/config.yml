@@ -73,18 +73,28 @@ jobs:
 workflows:
   build:
     jobs:
-      - build:
+      - build-jammy-amd64:
           filters:
             tags:
               only: /.*/
-      - build-arm64:
+      - build-noble-amd64:
+          filters:
+            tags:
+              only: /.*/
+      - build-jammy-arm64:
+          filters:
+            tags:
+              only: /.*/
+      - build-noble-arm64:
           filters:
             tags:
               only: /.*/
       - publish-github-release:
           requires:
-            - build
-            - build-arm64
+            - build-jammy-amd64
+            - build-noble-amd64
+            - build-jammy-arm64
+            - build-noble-arm64
           filters:
             branches:
               ignore: /.*/
