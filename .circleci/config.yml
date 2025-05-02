@@ -26,7 +26,7 @@ commands:
       - run:
           command: AWS_SDK_PATH=$HOME/aws-sdk-cpp make
       - run:
-          command: mkdir artifacts && cp aws_kms_pkcs11.so "artifacts/aws_kms_pkcs11.$(uname -m).so"
+          command: mkdir -p "artifacts/$(lsb_release -sr)" && cp aws_kms_pkcs11.so "artifacts/$(lsb_release -sr)/aws_kms_pkcs11.$(uname -m).so"
       - store_artifacts:
           path: artifacts
       - persist_to_workspace:
@@ -36,14 +36,25 @@ commands:
 
 
 jobs:
-  build:
+  build-jammy-amd64:
     docker:
-      - image: cimg/base:current
+      - image: ubuntu:22.04
     steps:
       - build_common
-  build-arm64:
+  build-noble-amd64:
+    docker:
+      - image: ubuntu:24.04
+    steps:
+      - build_common
+  build-jammy-arm64:
     machine:
       image: ubuntu-2204:current
+    resource_class: arm.medium
+    steps:
+      - build_common
+  build-noble-arm64:
+    machine:
+      image: ubuntu-2404:current
     resource_class: arm.medium
     steps:
       - build_common
