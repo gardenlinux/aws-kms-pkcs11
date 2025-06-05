@@ -11,7 +11,7 @@ ifeq ($(AWS_SDK_PATH),)
 endif
 
 # Try to find which subdir of the SDK has the libraries
-ifneq ($(AWS_SDK_PATH),)
+ifeq ($(AWS_SDK_LIB_PATH),)
   ifneq ($(wildcard $(AWS_SDK_PATH)/lib/libaws-c-common.*),)
     AWS_SDK_LIB_PATH := $(addsuffix /lib,$(AWS_SDK_PATH))
   else ifneq ($(wildcard $(AWS_SDK_PATH)/lib64/libaws-c-common.*),)
@@ -177,7 +177,7 @@ test: aws_kms_pkcs11_test certificates_test
 
 certificates_test: certificates.cpp certificates_test.cpp
 	g++ -g -fPIC -Wall -I$(AWS_SDK_PATH)/include $(PKCS11_INC) $(JSON_C_INC) $(PROXY_CFLAGS) -fno-exceptions -std=c++17 \
-        debug.cpp certificates.cpp certificates_test.cpp -o certificates_test $(STATIC_LIBS) $(LIBS) -lcrypto -ljson-c -lcurl
+        debug.cpp util.cpp certificates.cpp certificates_test.cpp -o certificates_test $(STATIC_LIBS) $(LIBS) -lcrypto -ljson-c -lcurl -lz
 
 aws_kms_pkcs11_test: aws_kms_pkcs11_test.c aws_kms_pkcs11.so
 	g++ -g -fPIC -Wall -I$(AWS_SDK_PATH)/include $(PKCS11_INC) $(JSON_C_INC) $(PROXY_CFLAGS) -fno-exceptions -std=c++17 \
@@ -185,10 +185,11 @@ aws_kms_pkcs11_test: aws_kms_pkcs11_test.c aws_kms_pkcs11.so
 
 aws_kms_pkcs11.so: aws_kms_pkcs11.cpp unsupported.cpp aws_kms_slot.cpp debug.cpp util.cpp attributes.cpp certificates.cpp
 	g++ -shared -fPIC -Wall -I$(AWS_SDK_PATH)/include $(PKCS11_INC) $(JSON_C_INC) $(PROXY_CFLAGS) -fno-exceptions -std=c++17 $(SRC) \
-	    -o aws_kms_pkcs11.so $(STATIC_LIBS) $(LIBS) -lcrypto -ljson-c -lcurl
+	    -o aws_kms_pkcs11.so $(STATIC_LIBS) $(LIBS) -lcrypto -ljson-c -lcurl -lz
 
 install: aws_kms_pkcs11.so
-	cp aws_kms_pkcs11.so $(PKCS11_MOD_PATH)/
+	mkdir -p $(DESTDIR)$(PKCS11_MOD_PATH)
+	cp aws_kms_pkcs11.so $(DESTDIR)$(PKCS11_MOD_PATH)/
 
 uninstall:
-	rm -f $(PKCS11_MOD_PATH)/aws_kms_pkcs11.so
+	rm -f $(DESTDIR)$(PKCS11_MOD_PATH)/aws_kms_pkcs11.so
