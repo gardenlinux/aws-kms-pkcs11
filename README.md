@@ -234,6 +234,7 @@ The easiest way to install the provider is to download the binary artifact from 
 The Makefile in this repo tries to intuit the location of the various components and libraries it needs. This can be controlled by the following variables:
 
 `AWS_SDK_PATH`       : Path to the AWS sdk  
+`AWS_SDK_LIB_PATH`   : Path to the AWS sdk libraries (optional)
 `PKCS11_INC`         : Path to the pkcs11.h header file  
 `JSON_C_INC`         : Path to the json-c library headers  
 
@@ -247,6 +248,6 @@ the static ones if available, otherwise the dynamic ones:
 `AWS_SDK_CPP_STATIC = y` : Force use of static libraries for C++  
 `AWS_SDK_CPP_STATIC = n` : Force use of dynamic libraries for C++  
 
-The variable `PKCS11_MOD_PATH` can be used to control the destination directory for `make install`.
+The variable `PKCS11_MOD_PATH` can be used to control the destination directory for `make install`. The variable `DESTDIR` can be used to install to a staging directory.
 
 The variable `AWS_SDK_USE_SYSTEM_PROXY` can be set to `y` to cause aws-kms-pkcs11 to use the HTTP proxy server set in the `HTTPS_PROXY` environment variable. This defaults to `n`, meaning the proxy settings from the environment are ignored by default. See [AWS Command Line Interface - Use an HTTP proxy](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-proxy.html) and [aws-sdk-cpp#2679](https://github.com/aws/aws-sdk-cpp/pull/2679) for further details. Note that this option was, as of this writing, added relatively recently (September 2023) and the library may therefore not compile with `AWS_SDK_USE_SYSTEM_PROXY=y`.
